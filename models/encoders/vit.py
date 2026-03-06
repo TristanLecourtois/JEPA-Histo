@@ -372,22 +372,34 @@ class VisionTransformer(nn.Module):
 
 def vit_tiny(**kwargs) -> VisionTransformer:
     """ViT-Ti/8: embed_dim=192, depth=12, heads=3."""
-    return VisionTransformer(embed_dim=192, depth=12, num_heads=3, **kwargs)
+    kwargs.setdefault("embed_dim", 192)
+    kwargs.setdefault("depth", 12)
+    kwargs.setdefault("num_heads", 3)
+    return VisionTransformer(**kwargs)
 
 
 def vit_small(**kwargs) -> VisionTransformer:
     """ViT-S/8: embed_dim=384, depth=12, heads=6."""
-    return VisionTransformer(embed_dim=384, depth=12, num_heads=6, **kwargs)
+    kwargs.setdefault("embed_dim", 384)
+    kwargs.setdefault("depth", 12)
+    kwargs.setdefault("num_heads", 6)
+    return VisionTransformer(**kwargs)
 
 
 def vit_base(**kwargs) -> VisionTransformer:
     """ViT-B/8: embed_dim=768, depth=12, heads=12."""
-    return VisionTransformer(embed_dim=768, depth=12, num_heads=12, **kwargs)
+    kwargs.setdefault("embed_dim", 768)
+    kwargs.setdefault("depth", 12)
+    kwargs.setdefault("num_heads", 12)
+    return VisionTransformer(**kwargs)
 
 
 def vit_large(**kwargs) -> VisionTransformer:
     """ViT-L/16: embed_dim=1024, depth=24, heads=16."""
-    return VisionTransformer(embed_dim=1024, depth=24, num_heads=16, **kwargs)
+    kwargs.setdefault("embed_dim", 1024)
+    kwargs.setdefault("depth", 24)
+    kwargs.setdefault("num_heads", 16)
+    return VisionTransformer(**kwargs)
 
 
 VIT_REGISTRY = {
