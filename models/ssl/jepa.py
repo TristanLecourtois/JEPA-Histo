@@ -46,6 +46,28 @@ from models.heads.predictor import JEPAPredictor, build_predictor
 from utils.patching import create_jepa_masks
 
 
+def _clip_mask_to_min(masks: torch.Tensor) -> torch.Tensor:
+    """Clip boolean masks so every batch item has the same number of True tokens.
+
+    Random block sampling can produce slightly different token counts per image.
+    Batched boolean-index reshapes require uniform counts, so we drop excess
+    True positions (keeping the first min_count ones in raster order).
+
+    Args:
+        masks: Bool tensor of shape ``(B, N)``.
+
+    Returns:
+        Clipped bool tensor of shape ``(B, N)`` where each row has exactly
+        ``min_count`` True values.
+    """
+    min_count = int(masks.sum(dim=1).min().item())
+    clipped = torch.zeros_like(masks)
+    for i in range(masks.shape[0]):
+        indices = masks[i].nonzero(as_tuple=True)[0][:min_count]
+        clipped[i, indices] = True
+    return clipped
+
+
 class IJEPA(nn.Module):
     """Full I-JEPA model: context encoder + EMA target encoder + predictor.
 
@@ -142,6 +164,13 @@ class IJEPA(nn.Module):
 
         context_masks = torch.stack(ctx_list).to(device)
         target_masks  = torch.stack(tgt_list).to(device)
+
+        # Clip each mask to the minimum True-count across the batch so that
+        # all items have exactly the same number of tokens — required for the
+        # batched boolean-indexing reshape in the encoder and predictor.
+        context_masks = _clip_mask_to_min(context_masks)
+        target_masks  = _clip_mask_to_min(target_masks)
+
         return context_masks, target_masks
 
     # ------------------------------------------------------------------
