@@ -39,13 +39,12 @@ from torch.utils.data import Dataset
 
 logger = logging.getLogger(__name__)
 
+# Maps split name → prefix used in the actual filenames
 _SPLIT_MAP = {
-    "train": ("train_x", "train_y"),
-    "val":   ("valid_x", "valid_y"),
-    "test":  ("test_x",  "test_y"),
+    "train": "train",
+    "val":   "valid",
+    "test":  "test",
 }
-
-_FILE_TEMPLATE = "camelyonpatch_level_2_split_{split}_{xy}.h5"
 
 
 class PatchCamelyon(Dataset):
@@ -92,9 +91,9 @@ class PatchCamelyon(Dataset):
         if split not in _SPLIT_MAP:
             raise ValueError(f"split must be one of {list(_SPLIT_MAP)}; got {split!r}")
 
-        x_key, y_key = _SPLIT_MAP[split]
-        x_path = self.root / _FILE_TEMPLATE.format(split=x_key, xy="x")
-        y_path = self.root / _FILE_TEMPLATE.format(split=y_key, xy="y")
+        prefix = _SPLIT_MAP[split]
+        x_path = self.root / f"camelyonpatch_level_2_split_{prefix}_x.h5"
+        y_path = self.root / f"camelyonpatch_level_2_split_{prefix}_y.h5"
 
         for p in (x_path, y_path):
             if not p.exists():
