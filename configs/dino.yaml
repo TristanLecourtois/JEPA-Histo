@@ -1,0 +1,99 @@
+# =============================================================================
+# DINO Configuration for Histopathology Self-Supervised Pretraining
+# Reference: Caron et al., "Emerging Properties in Self-Supervised Vision
+#            Transformers", ICCV 2021.
+# =============================================================================
+
+experiment:
+  name: "dino_histo_pretrain"
+  output_dir: "outputs/dino"
+  seed: 42
+  log_every: 50
+  save_every: 10
+
+data:
+  dataset: "patchcamelyon"
+  data_root: "data/patchcamelyon"
+  image_size: 96
+  num_workers: 8
+  pin_memory: true
+
+model:
+  encoder:
+    arch: "vit_small"
+    patch_size: 8
+    embed_dim: 384
+    depth: 12
+    num_heads: 6
+    mlp_ratio: 4.0
+    drop_path_rate: 0.1
+    use_cls_token: true             # DINO uses the [CLS] token
+
+  projection_head:
+    hidden_dim: 2048
+    bottleneck_dim: 256
+    out_dim: 65536
+    norm_last_layer: true
+    nlayers: 3
+
+  ema:
+    momentum_start: 0.996
+    momentum_end: 1.0
+
+dino:
+  student_temp: 0.1
+  teacher_temp_start: 0.04
+  teacher_temp_end: 0.07
+  teacher_temp_warmup_epochs: 30
+  center_momentum: 0.9
+
+optimizer:
+  name: "adamw"
+  base_lr: 5e-4
+  weight_decay_start: 0.04
+  weight_decay_end: 0.4
+  beta1: 0.9
+  beta2: 0.999
+  clip_grad: 3.0
+
+scheduler:
+  name: "cosine"
+  warmup_epochs: 10
+  min_lr: 1e-6
+
+training:
+  epochs: 300
+  batch_size: 512
+  fp16: true
+
+augmentation:
+  # Two global crops + N local crops
+  global_crops_scale: [0.4, 1.0]
+  local_crops_scale: [0.05, 0.4]
+  num_local_crops: 8
+  local_crop_size: 32
+  horizontal_flip: true
+  vertical_flip: true
+  color_jitter:
+    enabled: true
+    brightness: 0.4
+    contrast: 0.4
+    saturation: 0.2
+    hue: 0.1
+    prob: 0.8
+  grayscale:
+    prob: 0.2
+  gaussian_blur:
+    global_prob: [1.0, 0.1]
+    local_prob: 0.5
+    sigma: [0.1, 2.0]
+  solarize:
+    prob: 0.2
+  stain_jitter:
+    enabled: true
+    sigma1: 0.2
+    sigma2: 0.2
+    prob: 0.5
+  normalize:
+    mean: [0.7008, 0.5384, 0.6916]
+    std:  [0.2350, 0.2774, 0.2128]

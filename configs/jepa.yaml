@@ -1,0 +1,113 @@
+# =============================================================================
+# I-JEPA Configuration for Histopathology Self-Supervised Pretraining
+# Reference: Assran et al., "Self-Supervised Learning from Images with a
+#            Joint-Embedding Predictive Architecture", CVPR 2023.
+# =============================================================================
+
+experiment:
+  name: "jepa_histo_pretrain"
+  output_dir: "outputs/jepa"
+  seed: 42
+  log_every: 50
+  save_every: 10  # epochs
+
+# -----------------------------------------------------------------------------
+# Data
+# -----------------------------------------------------------------------------
+data:
+  dataset: "patchcamelyon"          # patchcamelyon | camelyon16 | tcga
+  data_root: "data/patchcamelyon"
+  image_size: 96                    # PatchCamelyon native resolution
+  num_workers: 8
+  pin_memory: true
+
+# -----------------------------------------------------------------------------
+# Masking strategy (I-JEPA specific)
+# -----------------------------------------------------------------------------
+masking:
+  patch_size: 8                     # tokens: image_size / patch_size = 12x12 grid
+  # Context masking: keep a random subset of patches
+  context_scale: [0.85, 1.0]       # fraction of patches kept as context
+  context_aspect_ratio: [0.75, 1.5]
+  # Target blocks: predict N non-overlapping blocks
+  num_target_blocks: 4
+  target_scale: [0.15, 0.2]        # fraction of patches per target block
+  target_aspect_ratio: [0.75, 1.5]
+  allow_overlap: false              # targets must not overlap context
+
+# -----------------------------------------------------------------------------
+# Architecture
+# -----------------------------------------------------------------------------
+model:
+  encoder:
+    arch: "vit_small"               # vit_tiny | vit_small | vit_base | vit_large
+    patch_size: 8
+    embed_dim: 384
+    depth: 12
+    num_heads: 6
+    mlp_ratio: 4.0
+    drop_path_rate: 0.1
+    use_cls_token: false            # I-JEPA uses patch tokens only
+
+  predictor:
+    depth: 6
+    num_heads: 6
+    embed_dim: 384
+    predictor_embed_dim: 192        # narrow predictor
+    drop_path_rate: 0.0
+
+  ema:
+    momentum_start: 0.996
+    momentum_end: 1.0               # cosine schedule toward 1.0
+
+# -----------------------------------------------------------------------------
+# Optimisation
+# -----------------------------------------------------------------------------
+optimizer:
+  name: "adamw"
+  base_lr: 1.5e-4                   # scaled as lr = base_lr * batch / 256
+  weight_decay: 0.05
+  beta1: 0.9
+  beta2: 0.95
+  clip_grad: 1.0
+
+scheduler:
+  name: "cosine"
+  warmup_epochs: 15
+  min_lr: 1e-6
+
+training:
+  epochs: 300
+  batch_size: 512                   # total across GPUs
+  fp16: true
+
+# -----------------------------------------------------------------------------
+# Augmentations
+# -----------------------------------------------------------------------------
+augmentation:
+  # Standard histopathology-adapted augmentations
+  random_resized_crop:
+    scale: [0.4, 1.0]
+    ratio: [0.75, 1.33]
+  horizontal_flip: true
+  vertical_flip: true               # histology images have no canonical orientation
+  color_jitter:
+    enabled: true
+    brightness: 0.4
+    contrast: 0.4
+    saturation: 0.2
+    hue: 0.1
+    prob: 0.8
+  grayscale:
+    prob: 0.2
+  gaussian_blur:
+    prob: 0.5
+    sigma: [0.1, 2.0]
+  stain_jitter:                     # H&E stain augmentation
+    enabled: true
+    sigma1: 0.2
+    sigma2: 0.2
+    prob: 0.5
+  normalize:
+    mean: [0.7008, 0.5384, 0.6916]  # PatchCamelyon H&E statistics
+    std:  [0.2350, 0.2774, 0.2128]

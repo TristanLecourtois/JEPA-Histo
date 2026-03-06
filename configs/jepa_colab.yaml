@@ -1,0 +1,111 @@
+# =============================================================================
+# I-JEPA — Configuration optimisée pour Google Colab (GPU T4 / A100)
+# Différences vs jepa.yaml :
+#   - batch_size réduit pour tenir dans 15 Go VRAM (T4)
+#   - num_workers = 2 (limitation Colab)
+#   - epochs = 100 (compromis vitesse / qualité pour un premier run)
+# =============================================================================
+
+experiment:
+  name: "jepa_pcam_colab"
+  method: "jepa"
+  output_dir: "/content/drive/MyDrive/JEPA-Histo/outputs/jepa"
+  seed: 42
+  log_every: 20
+  save_every: 5
+
+data:
+  dataset: "patchcamelyon"
+  data_root: "/content/data/patchcamelyon"
+  image_size: 96
+  num_workers: 2
+  pin_memory: true
+
+masking:
+  patch_size: 8
+  context_scale: [0.85, 1.0]
+  context_aspect_ratio: [0.75, 1.5]
+  num_target_blocks: 4
+  target_scale: [0.15, 0.2]
+  target_aspect_ratio: [0.75, 1.5]
+  allow_overlap: false
+
+model:
+  encoder:
+    arch: "vit_small"
+    patch_size: 8
+    embed_dim: 384
+    depth: 12
+    num_heads: 6
+    mlp_ratio: 4.0
+    drop_path_rate: 0.1
+    use_cls_token: false
+    image_size: 96
+
+  predictor:
+    depth: 6
+    num_heads: 6
+    embed_dim: 384
+    predictor_embed_dim: 192
+    drop_path_rate: 0.0
+
+  ema:
+    momentum_start: 0.996
+    momentum_end: 1.0
+
+optimizer:
+  name: "adamw"
+  base_lr: 1.5e-4
+  weight_decay: 0.05
+  beta1: 0.9
+  beta2: 0.95
+  clip_grad: 1.0
+
+scheduler:
+  name: "cosine"
+  warmup_epochs: 10
+  min_lr: 1e-6
+
+training:
+  epochs: 100           # ~3-4h sur T4 avec batch=128
+  batch_size: 128       # T4 15Go : 128 | A100 40Go : 512
+  fp16: true
+
+linear_probe:
+  lr: 1e-3
+  weight_decay: 0.0
+  epochs: 50
+  batch_size: 256
+
+few_shot:
+  lr: 1e-3
+  weight_decay: 0.0
+  epochs: 50
+  batch_size: 256
+
+augmentation:
+  random_resized_crop:
+    scale: [0.4, 1.0]
+    ratio: [0.75, 1.33]
+  horizontal_flip: true
+  vertical_flip: true
+  color_jitter:
+    enabled: true
+    brightness: 0.4
+    contrast: 0.4
+    saturation: 0.2
+    hue: 0.1
+    prob: 0.8
+  grayscale:
+    prob: 0.2
+  gaussian_blur:
+    prob: 0.5
+    sigma: [0.1, 2.0]
+  stain_jitter:
+    enabled: true
+    sigma1: 0.2
+    sigma2: 0.2
+    prob: 0.5
+  normalize:
+    mean: [0.7008, 0.5384, 0.6916]
+    std:  [0.2350, 0.2774, 0.2128]
