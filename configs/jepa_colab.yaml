@@ -11,8 +11,8 @@ experiment:
   method: "jepa"
   output_dir: "/content/drive/MyDrive/JEPA-Histo/outputs/jepa"
   seed: 42
-  log_every: 20
-  save_every: 5
+  log_every: 100
+  save_every: 2
 
 data:
   dataset: "patchcamelyon"
@@ -67,8 +67,8 @@ scheduler:
   min_lr: 1e-6
 
 training:
-  epochs: 100           # ~3-4h sur T4 avec batch=128
-  batch_size: 128       # T4 15Go : 128 | A100 40Go : 512
+  epochs: 100          
+  batch_size: 128      
   fp16: true
 
 linear_probe:
