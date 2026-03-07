@@ -1,12 +1,3 @@
-"""
-Projection and prototyping heads for self-supervised learning.
-
-Implements:
-  - :class:`DINOHead`:   3-layer MLP + normalised linear output for DINO.
-  - :class:`MAEDecoder`: lightweight Transformer decoder for pixel reconstruction.
-  - :class:`ProjectionMLP`: standard 2-layer projection head (SimCLR-style).
-"""
-
 from __future__ import annotations
 
 import math
@@ -20,10 +11,6 @@ from timm.models.layers import trunc_normal_
 
 from models.encoders.vit import Block, get_2d_sincos_pos_embed
 
-
-# ---------------------------------------------------------------------------
-# DINO projection head
-# ---------------------------------------------------------------------------
 
 class DINOHead(nn.Module):
     """DINO projection head.
@@ -94,10 +81,6 @@ class DINOHead(nn.Module):
         x = self.last_layer(x)
         return x
 
-
-# ---------------------------------------------------------------------------
-# MAE decoder
-# ---------------------------------------------------------------------------
 
 class MAEDecoder(nn.Module):
     """Lightweight Transformer decoder for MAE pixel reconstruction.
@@ -209,10 +192,6 @@ class MAEDecoder(nn.Module):
         x = x[:, 1:, :]                         # remove CLS token
         return x
 
-
-# ---------------------------------------------------------------------------
-# Generic projection MLP
-# ---------------------------------------------------------------------------
 
 class ProjectionMLP(nn.Module):
     """Two-layer projection MLP (SimCLR / Barlow-Twins style).

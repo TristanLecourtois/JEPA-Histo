@@ -1,12 +1,3 @@
-"""
-Abstract base class for histopathology datasets used in this project.
-
-All concrete datasets inherit from :class:`HistoDataset` and override
-``_load_samples`` to populate ``self.samples`` with ``(path, label)`` pairs.
-This design guarantees a uniform interface for training, evaluation, and
-few-shot sampling across PatchCamelyon, CAMELYON16, and TCGA.
-"""
-
 from __future__ import annotations
 
 import abc
@@ -58,10 +49,6 @@ class HistoDataset(Dataset, abc.ABC):
         Must be implemented by every concrete subclass.
         """
 
-    # ------------------------------------------------------------------
-    # Dataset interface
-    # ------------------------------------------------------------------
-
     def __len__(self) -> int:
         return len(self.samples)
 
@@ -73,10 +60,6 @@ class HistoDataset(Dataset, abc.ABC):
         if self.target_transform is not None:
             label = self.target_transform(label)
         return img, label
-
-    # ------------------------------------------------------------------
-    # Few-shot helpers
-    # ------------------------------------------------------------------
 
     def get_class_indices(self) -> Dict[int, List[int]]:
         """Return a mapping from class index to sample indices.
@@ -148,9 +131,6 @@ class HistoDataset(Dataset, abc.ABC):
         new_ds.samples = selected
         return new_ds
 
-    # ------------------------------------------------------------------
-    # Properties
-    # ------------------------------------------------------------------
 
     @property
     def num_classes(self) -> int:

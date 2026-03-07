@@ -1,11 +1,3 @@
-"""
-Linear evaluation head for frozen encoder representations.
-
-A single linear layer attached to a frozen encoder constitutes the canonical
-linear probe protocol.  This module also provides a lightweight MLP probe
-for ablation studies comparing linear vs. non-linear transfer.
-"""
-
 from __future__ import annotations
 
 import torch

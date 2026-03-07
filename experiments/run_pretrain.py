@@ -45,10 +45,6 @@ from utils.seed import set_seed
 from utils.transforms import build_ssl_transform
 
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="SSL pretraining for histopathology")
     parser.add_argument("--config",     type=str, required=True,
@@ -61,10 +57,6 @@ def parse_args() -> argparse.Namespace:
                         help="Disable Weights & Biases logging.")
     return parser.parse_args()
 
-
-# ---------------------------------------------------------------------------
-# Dataset factory
-# ---------------------------------------------------------------------------
 
 def build_dataset(cfg: dict, transform):
     """Instantiate the pretraining dataset from the config."""
@@ -81,10 +73,6 @@ def build_dataset(cfg: dict, transform):
     else:
         raise ValueError(f"Unknown dataset: {name!r}")
 
-
-# ---------------------------------------------------------------------------
-# Model factory
-# ---------------------------------------------------------------------------
 
 def build_model(cfg: dict):
     """Instantiate the SSL model and associated schedulers."""
@@ -119,11 +107,6 @@ def build_model(cfg: dict):
 
     else:
         raise ValueError(f"Unknown SSL method: {method!r}")
-
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     args = parse_args()

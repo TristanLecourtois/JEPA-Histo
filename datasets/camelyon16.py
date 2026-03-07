@@ -23,9 +23,6 @@ Expected directory layout::
             normal/   *.jpg
             tumor/    *.jpg
 
-Reference:
-  Litjens et al., "1399 H&E-stained sentinel lymph node sections of breast
-  cancer patients: the CAMELYON dataset", GigaScience 2018.
 """
 
 from __future__ import annotations

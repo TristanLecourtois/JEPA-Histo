@@ -1,11 +1,4 @@
 """
-Few-shot learning evaluation for self-supervised histopathology representations.
-
-Evaluates the quality of frozen encoder representations under label-scarce
-conditions by training a linear probe with only a small fraction of the
-available labels (1 %, 5 %, 10 %).  This directly models the realistic
-clinical scenario where expert annotation is expensive and limited.
-
 Protocol:
   1. Extract features from the frozen encoder for all splits.
   2. For each label fraction in ``{1%, 5%, 10%}``:
@@ -13,12 +6,6 @@ Protocol:
      b. Train a linear classifier on the subset features.
      c. Evaluate on the *full* test set (accuracy + AUROC).
   3. Report mean ± std over multiple random seeds for statistical validity.
-
-This protocol follows:
-  - Azizi et al., "Big Self-Supervised Models Advance Medical Image
-    Classification", ICCV 2021.
-  - Chen et al., "A Simple Framework for Contrastive Learning of Visual
-    Representations", ICML 2020.
 """
 
 from __future__ import annotations
@@ -35,11 +22,6 @@ from evaluation.metrics import accuracy, auroc
 from models.heads.linear_probe import LinearProbe
 from training.linear_probe import extract_features, train_linear_head
 from utils.logger import Logger
-
-
-# ---------------------------------------------------------------------------
-# Stratified subset sampling
-# ---------------------------------------------------------------------------
 
 def stratified_sample(
     labels: torch.Tensor,
@@ -71,10 +53,6 @@ def stratified_sample(
 
     return torch.tensor(selected, dtype=torch.long)
 
-
-# ---------------------------------------------------------------------------
-# Single few-shot trial
-# ---------------------------------------------------------------------------
 
 def few_shot_trial(
     train_features: torch.Tensor,
@@ -130,10 +108,6 @@ def few_shot_trial(
     auc   = auroc(test_logits, test_labels, num_classes=num_classes)
     return {"acc": acc, "auroc": auc}
 
-
-# ---------------------------------------------------------------------------
-# Full few-shot evaluation sweep
-# ---------------------------------------------------------------------------
 
 def run_few_shot_evaluation(
     encoder: nn.Module,

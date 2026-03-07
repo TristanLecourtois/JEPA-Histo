@@ -112,10 +112,6 @@ class PatchCamelyon(Dataset):
             "Loaded PatchCamelyon %s split: %d samples.", split, len(self._x)
         )
 
-    # ------------------------------------------------------------------
-    # Dataset interface
-    # ------------------------------------------------------------------
-
     def __len__(self) -> int:
         return len(self._x)
 
@@ -135,10 +131,6 @@ class PatchCamelyon(Dataset):
             self._h5x.close()
         if hasattr(self, "_h5y"):
             self._h5y.close()
-
-    # ------------------------------------------------------------------
-    # Few-shot helpers (mirrors HistoDataset API)
-    # ------------------------------------------------------------------
 
     @property
     def num_classes(self) -> int:

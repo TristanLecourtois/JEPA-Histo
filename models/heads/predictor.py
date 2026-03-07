@@ -1,22 +1,4 @@
-"""
-I-JEPA Predictor network.
 
-The predictor is a *narrow* Transformer that operates entirely in latent space.
-Given a set of context token embeddings and the positional embeddings of target
-tokens, it predicts the target encoder's output at those positions—without ever
-seeing the raw target pixels.
-
-Design choices (following Assran et al. 2023):
-  - The predictor has fewer heads / layers than the encoder to form a
-    representational bottleneck (forces the predictor to ``compress'').
-  - Positional queries for target positions are injected as learned
-    positional shifts on top of sinusoidal embeddings.
-  - No [CLS] token.
-
-Reference:
-  Assran et al., "Self-Supervised Learning from Images with a
-  Joint-Embedding Predictive Architecture", CVPR 2023.
-"""
 
 from __future__ import annotations
 

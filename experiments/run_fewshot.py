@@ -5,7 +5,7 @@ Evaluates the quality of frozen SSL representations under label-scarce
 conditions by sweeping over label fractions {1%, 5%, 10%, 100%} across
 multiple random seeds.  Reports mean ± std accuracy and AUROC.
 
-Example usage::
+Example usage:
 
     python experiments/run_fewshot.py \\
         --config configs/jepa.yaml \\
@@ -43,10 +43,6 @@ from utils.seed import set_seed
 from utils.transforms import build_eval_transform
 
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Few-shot evaluation")
     parser.add_argument("--config",     type=str, required=True)
@@ -63,10 +59,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no_wandb",   action="store_true")
     return parser.parse_args()
 
-
-# ---------------------------------------------------------------------------
-# Encoder loader (shared with run_linear_probe.py)
-# ---------------------------------------------------------------------------
 
 def load_encoder(cfg: dict, checkpoint_path: str, method: str):
     ckpt  = torch.load(checkpoint_path, map_location="cpu")
@@ -104,10 +96,6 @@ def load_encoder(cfg: dict, checkpoint_path: str, method: str):
 
     raise ValueError(f"Unknown method: {method!r}")
 
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     args = parse_args()

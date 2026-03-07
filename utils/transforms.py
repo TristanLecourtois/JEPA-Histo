@@ -1,18 +1,5 @@
 """
 Data augmentation pipelines for histopathology SSL pretraining.
-
-Key design choices:
-  - Vertical flips are included because H&E slides have no canonical orientation.
-  - H&E stain augmentation (``StainJitter``) simulates scanner and
-    staining-protocol variability across sites, improving domain robustness.
-  - Color jitter parameters are tuned for H&E chromatic range (purple/pink).
-
-References:
-  - Tellez et al., "Quantifying the effects of data augmentation and stain
-    color normalization in convolutional neural networks for computational
-    pathology", Medical Image Analysis, 2019.
-  - Macenko et al., "A method for normalizing histology slides for
-    quantitative analysis", ISBI 2009.
 """
 
 from __future__ import annotations
@@ -25,10 +12,6 @@ import torchvision.transforms as T
 import torchvision.transforms.functional as TF
 from PIL import Image
 
-
-# ---------------------------------------------------------------------------
-# H&E stain augmentation
-# ---------------------------------------------------------------------------
 
 class StainJitter:
     """Perturb H&E stain concentrations in the optical-density space.
@@ -95,9 +78,8 @@ class StainJitter:
         )
 
 
-# ---------------------------------------------------------------------------
+
 # Multi-crop transform (DINO)
-# ---------------------------------------------------------------------------
 
 class MultiCropTransform:
     """Produce multiple crops of different scales from a single image.
@@ -164,10 +146,6 @@ class MultiCropTransform:
         crops += [self.local_transform(img) for _ in range(self.num_local_crops)]
         return crops
 
-
-# ---------------------------------------------------------------------------
-# Factory helpers
-# ---------------------------------------------------------------------------
 
 def build_ssl_transform(cfg: dict, mode: str = "jepa") -> T.Compose:
     """Build the augmentation pipeline from a config dictionary.

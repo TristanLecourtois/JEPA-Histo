@@ -1,18 +1,3 @@
-"""
-Masked Autoencoder (MAE) for histopathology self-supervised pretraining.
-
-MAE masks a large fraction (default 75 %) of image patches and trains an
-encoder–decoder pair to reconstruct the raw pixel values of the masked patches.
-Only the encoder is retained at fine-tuning time.
-
-Architecture:
-  - Encoder: ViT processes only *visible* (unmasked) patches.
-  - Decoder: lightweight Transformer that sees all positions (visible +
-    learnable mask tokens) and predicts normalised pixel patches.
-
-Reference:
-  He et al., "Masked Autoencoders Are Scalable Vision Learners", CVPR 2022.
-"""
 
 from __future__ import annotations
 
@@ -67,9 +52,6 @@ class MAE(nn.Module):
             grid_w            = grid_w,
         )
 
-    # ------------------------------------------------------------------
-    # Masking
-    # ------------------------------------------------------------------
 
     def _mask_and_encode(
         self, images: torch.Tensor
@@ -136,9 +118,6 @@ class MAE(nn.Module):
 
         return x_vis, mask, ids_restore
 
-    # ------------------------------------------------------------------
-    # Loss
-    # ------------------------------------------------------------------
 
     def _reconstruction_loss(
         self,
@@ -168,10 +147,6 @@ class MAE(nn.Module):
         loss = loss.mean(dim=-1)         # (B, N)
         loss = (loss * mask).sum() / mask.sum()
         return loss
-
-    # ------------------------------------------------------------------
-    # Forward
-    # ------------------------------------------------------------------
 
     def forward(self, images: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Compute MAE reconstruction loss.

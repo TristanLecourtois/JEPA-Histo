@@ -10,32 +10,7 @@ Acquiring expert-annotated histopathology slides is expensive and time-consuming
 We investigate **Image JEPA (I-JEPA)** — a self-supervised method that learns representations by predicting missing regions of an image *entirely in latent space*, without pixel-level reconstruction — as a pretraining strategy for H&E-stained whole-slide image analysis.
 Unlike contrastive methods (DINO) that require view augmentation invariance, or generative methods (MAE) that encourage low-level texture encoding, I-JEPA's latent prediction objective naturally biases the encoder towards *semantic* patch representations.
 We pretrain ViT-S/8 encoders on PatchCamelyon and evaluate on linear probing and few-shot classification at 1%, 5%, and 10% label fractions, reporting accuracy and AUROC.
-Our results demonstrate that I-JEPA yields competitive or superior representations under label-scarce conditions, supporting its adoption as a pretraining backbone for data-efficient computational pathology.
 
----
-
-## Table of Contents
-
-- [JEPA-Histo: Joint-Embedding Predictive Architecture for Histopathology Representation Learning](#jepa-histo-joint-embedding-predictive-architecture-for-histopathology-representation-learning)
-  - [Abstract](#abstract)
-  - [Table of Contents](#table-of-contents)
-  - [Motivation](#motivation)
-  - [Method](#method)
-    - [I-JEPA Architecture](#i-jepa-architecture)
-    - [Baselines](#baselines)
-  - [Repository Structure](#repository-structure)
-  - [Installation](#installation)
-  - [Datasets](#datasets)
-    - [PatchCamelyon (PCam)](#patchcamelyon-pcam)
-    - [CAMELYON16](#camelyon16)
-    - [TCGA](#tcga)
-  - [Experiments](#experiments)
-    - [1. Self-Supervised Pretraining](#1-self-supervised-pretraining)
-    - [2. Linear Probe Evaluation](#2-linear-probe-evaluation)
-    - [3. Few-Shot Learning](#3-few-shot-learning)
-  - [Configuration Reference](#configuration-reference)
-  - [References](#references)
-  - [License](#license)
 
 ---
 
@@ -56,24 +31,6 @@ Because the prediction task is posed entirely in representation space, the model
 ---
 
 ## Method
-
-### I-JEPA Architecture
-
-```
-Input image  (B × C × H × W)
-     │
-     ├── [context mask] ──► Context Encoder (ViT-S/8)  ──► context tokens
-     │                                                         │
-     │                                                   Predictor (narrow ViT)
-     │                                               + positional queries for targets
-     │                                                         │
-     │                                               predicted target embeddings
-     │
-     └── [target mask]  ──► Target Encoder (EMA copy) ──► target tokens
-                                                                │
-                                               MSE Loss ◄───────┘
-                                          (in normalised latent space)
-```
 
 **Masking strategy.**
 Four non-overlapping rectangular target blocks are sampled from the token grid (each covering 15–20% of patches, aspect ratio 0.75–1.5).

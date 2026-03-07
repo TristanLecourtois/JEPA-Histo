@@ -23,10 +23,6 @@ import torch
 import torch.nn.functional as F
 
 
-# ---------------------------------------------------------------------------
-# Accuracy
-# ---------------------------------------------------------------------------
-
 def accuracy(
     logits: torch.Tensor,
     labels: torch.Tensor,
@@ -71,9 +67,6 @@ def balanced_accuracy(
     return float(np.mean(recalls))
 
 
-# ---------------------------------------------------------------------------
-# AUROC
-# ---------------------------------------------------------------------------
 
 def auroc(
     logits: torch.Tensor,
@@ -131,10 +124,6 @@ def _binary_auroc(scores: np.ndarray, labels: np.ndarray) -> float:
     return auc
 
 
-# ---------------------------------------------------------------------------
-# Average Precision (AUPRC)
-# ---------------------------------------------------------------------------
-
 def average_precision(
     logits: torch.Tensor,
     labels: torch.Tensor,
@@ -176,10 +165,6 @@ def _average_precision_binary(scores: np.ndarray, labels: np.ndarray) -> float:
     return float((prec * drecall).sum())
 
 
-# ---------------------------------------------------------------------------
-# Expected Calibration Error
-# ---------------------------------------------------------------------------
-
 def expected_calibration_error(
     logits: torch.Tensor,
     labels: torch.Tensor,
@@ -217,10 +202,6 @@ def expected_calibration_error(
     return float(ece / len(labels))
 
 
-# ---------------------------------------------------------------------------
-# Confusion matrix
-# ---------------------------------------------------------------------------
-
 def confusion_matrix(
     logits: torch.Tensor,
     labels: torch.Tensor,
@@ -245,10 +226,6 @@ def confusion_matrix(
         cm[t, p] += 1
     return cm
 
-
-# ---------------------------------------------------------------------------
-# Aggregated result dict
-# ---------------------------------------------------------------------------
 
 def compute_all_metrics(
     logits: torch.Tensor,

@@ -1,18 +1,3 @@
-"""
-ResNet encoder for self-supervised histopathology learning.
-
-Provides a thin wrapper around torchvision ResNet models that exposes a
-consistent interface with the ViT encoder:
-
-  - ``forward(x)`` → ``(patch_tokens, None)``
-  - ``forward_features(x)`` → global average-pooled features
-  - ``output_dim`` property
-
-ResNet variants serve as the convolutional baseline in ablation experiments.
-
-Reference:
-  He et al., "Deep Residual Learning for Image Recognition", CVPR 2016.
-"""
 
 from __future__ import annotations
 

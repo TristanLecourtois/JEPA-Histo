@@ -40,10 +40,6 @@ from utils.seed import set_seed
 from utils.transforms import build_eval_transform
 
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Linear probe evaluation")
     parser.add_argument("--config",     type=str, required=True)
@@ -60,10 +56,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no_wandb",   action="store_true")
     return parser.parse_args()
 
-
-# ---------------------------------------------------------------------------
-# Encoder loading
-# ---------------------------------------------------------------------------
 
 def load_encoder(cfg: dict, checkpoint_path: str, method: str):
     """Load the context / student encoder from a pretrained checkpoint."""
@@ -105,10 +97,6 @@ def load_encoder(cfg: dict, checkpoint_path: str, method: str):
 
     return encoder
 
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     args = parse_args()

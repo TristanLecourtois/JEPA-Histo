@@ -19,9 +19,6 @@ import numpy as np
 import torch
 
 
-# ---------------------------------------------------------------------------
-# WSI patch extraction
-# ---------------------------------------------------------------------------
 
 def extract_patches_from_wsi(
     slide_path: str,
@@ -98,9 +95,7 @@ def extract_patches_from_wsi(
     return patches, coords
 
 
-# ---------------------------------------------------------------------------
 # Token-level masking (I-JEPA / MAE)
-# ---------------------------------------------------------------------------
 
 def sample_block_mask(
     num_patches_h: int,

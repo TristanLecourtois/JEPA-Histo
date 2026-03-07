@@ -1,36 +1,3 @@
-"""
-Image JEPA (I-JEPA) for histopathology self-supervised pretraining.
-
-Architecture overview:
-  ┌─────────────────────────────────────────────────────────────────┐
-  │  Input image                                                    │
-  │      │                                                          │
-  │      ├──[context mask]──► Context Encoder (ViT)                │
-  │      │                         │                                │
-  │      │                         ▼                                │
-  │      │                   Predictor (narrow ViT)                 │
-  │      │                   + target positional queries            │
-  │      │                         │                                │
-  │      │                         ▼  predicted target embeddings   │
-  │      │                                                          │
-  │      └──[target mask]───► Target Encoder (EMA of context)      │
-  │                                 │                               │
-  │                                 ▼  actual target embeddings     │
-  │                                                                 │
-  │  Loss = MSE(predicted, actual)  [in normalised feature space]  │
-  └─────────────────────────────────────────────────────────────────┘
-
-Key properties:
-  - Predictions are in *latent* space → no pixel-level reconstruction.
-  - Target encoder is an EMA copy → no gradient through targets.
-  - Block masking creates structured prediction tasks that encourage
-    semantic representations over low-level texture matching.
-
-Reference:
-  Assran et al., "Self-Supervised Learning from Images with a
-  Joint-Embedding Predictive Architecture", CVPR 2023.
-"""
-
 from __future__ import annotations
 
 import copy
@@ -86,22 +53,15 @@ class IJEPA(nn.Module):
         ema_momentum: float = 0.996,
     ) -> None:
         super().__init__()
-
-        # ------------------------------------------------------------------
-        # Context encoder (trained with gradients)
-        # ------------------------------------------------------------------
+        # context encoder (trained with gradients)
         self.context_encoder: VisionTransformer = build_vit(encoder_cfg)
-
-        # ------------------------------------------------------------------
-        # Target encoder (EMA, no gradient)
-        # ------------------------------------------------------------------
+        # target encoder (EMA, no gradient)
         self.target_encoder: VisionTransformer = copy.deepcopy(self.context_encoder)
         for p in self.target_encoder.parameters():
             p.requires_grad_(False)
 
-        # ------------------------------------------------------------------
-        # Predictor
-        # ------------------------------------------------------------------
+        # predictor
+      
         grid_h = grid_w = (
             encoder_cfg.get("image_size", 96) // encoder_cfg.get("patch_size", 8)
         )
@@ -117,9 +77,8 @@ class IJEPA(nn.Module):
         self.grid_h       = grid_h
         self.grid_w       = grid_w
 
-    # ------------------------------------------------------------------
+    
     # EMA update
-    # ------------------------------------------------------------------
 
     @torch.no_grad()
     def update_target_encoder(self, momentum: float) -> None:
@@ -135,9 +94,8 @@ class IJEPA(nn.Module):
         ):
             param_t.data.mul_(momentum).add_((1 - momentum) * param_c.data)
 
-    # ------------------------------------------------------------------
+
     # Masking
-    # ------------------------------------------------------------------
 
     def _sample_masks(self, batch_size: int, device: torch.device):
         """Sample a fresh pair of context / target masks for one batch.
@@ -173,9 +131,6 @@ class IJEPA(nn.Module):
 
         return context_masks, target_masks
 
-    # ------------------------------------------------------------------
-    # Forward pass
-    # ------------------------------------------------------------------
 
     def forward(self, images: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Compute the I-JEPA self-supervised loss.
@@ -229,10 +184,8 @@ class IJEPA(nn.Module):
         return self.context_encoder.forward_features(images)
 
 
-# ---------------------------------------------------------------------------
-# EMA momentum scheduler
-# ---------------------------------------------------------------------------
 
+# EMA momentum scheduler
 class EMAMomentumScheduler:
     """Cosine schedule for the EMA momentum coefficient.
 

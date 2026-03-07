@@ -30,9 +30,6 @@ from torch.utils.data import DataLoader
 from utils.logger import Logger
 
 
-# ---------------------------------------------------------------------------
-# Optimiser & scheduler helpers
-# ---------------------------------------------------------------------------
 
 def build_optimizer(model: nn.Module, cfg: dict) -> AdamW:
     """Build AdamW optimiser, separating weight-decayed and non-decayed params.
@@ -99,9 +96,6 @@ def cosine_lr_schedule(
     return lr
 
 
-# ---------------------------------------------------------------------------
-# Checkpoint utilities
-# ---------------------------------------------------------------------------
 
 def save_checkpoint(
     output_dir: Path,
@@ -151,10 +145,6 @@ def load_checkpoint(
     return ckpt.get("epoch", 0) + 1
 
 
-# ---------------------------------------------------------------------------
-# Per-method batch step
-# ---------------------------------------------------------------------------
-
 def _jepa_step(model, batch, device) -> torch.Tensor:
     images, _ = batch
     images = images.to(device, non_blocking=True)
@@ -177,9 +167,6 @@ def _mae_step(model, batch, device) -> torch.Tensor:
     return out["loss"]
 
 
-# ---------------------------------------------------------------------------
-# Main training loop
-# ---------------------------------------------------------------------------
 
 def pretrain(
     model: nn.Module,

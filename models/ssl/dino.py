@@ -1,20 +1,4 @@
-"""
-DINO self-supervised learning for histopathology pretraining.
 
-DINO (Self-DIstillation with NO labels) is a knowledge-distillation SSL method
-where a student network is trained to match the output distribution of a
-teacher network (EMA of the student).  A centring mechanism prevents
-representation collapse.
-
-This implementation supports:
-  - Multi-crop training (2 global + N local crops).
-  - Cosine-annealed teacher temperature warm-up.
-  - Sinkhorn-Knopp centering following the original paper.
-
-Reference:
-  Caron et al., "Emerging Properties in Self-Supervised Vision Transformers",
-  ICCV 2021.
-"""
 
 from __future__ import annotations
 
@@ -77,9 +61,6 @@ class DINO(nn.Module):
         out_dim = head_cfg.get("out_dim", 65536)
         self.register_buffer("center", torch.zeros(1, out_dim))
 
-    # ------------------------------------------------------------------
-    # EMA update
-    # ------------------------------------------------------------------
 
     @torch.no_grad()
     def update_teacher(self, momentum: float) -> None:
@@ -93,10 +74,7 @@ class DINO(nn.Module):
         ):
             param_t.data.mul_(momentum).add_((1 - momentum) * param_s.data)
 
-    # ------------------------------------------------------------------
-    # Centering update (Eq. 4 in Caron et al.)
-    # ------------------------------------------------------------------
-
+ 
     @torch.no_grad()
     def update_center(self, teacher_output: torch.Tensor) -> None:
         """Update the running centring vector.
@@ -108,9 +86,6 @@ class DINO(nn.Module):
         batch_center = teacher_output.mean(dim=0, keepdim=True)
         self.center = self.center * m + batch_center * (1 - m)
 
-    # ------------------------------------------------------------------
-    # Loss
-    # ------------------------------------------------------------------
 
     @staticmethod
     def _softmax_with_temp(x: torch.Tensor, temp: float) -> torch.Tensor:
@@ -157,10 +132,6 @@ class DINO(nn.Module):
                 n_pairs    += 1
 
         return total_loss / n_pairs
-
-    # ------------------------------------------------------------------
-    # Forward
-    # ------------------------------------------------------------------
 
     def forward(
         self,
@@ -231,10 +202,6 @@ class DINO(nn.Module):
         """
         return self.teacher_encoder.forward_features(images)
 
-
-# ---------------------------------------------------------------------------
-# Teacher temperature scheduler
-# ---------------------------------------------------------------------------
 
 class TeacherTempScheduler:
     """Warm-up then constant schedule for the DINO teacher temperature.

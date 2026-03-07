@@ -26,10 +26,6 @@ from torch.utils.data import DataLoader
 from utils.logger import Logger
 
 
-# ---------------------------------------------------------------------------
-# Feature extraction
-# ---------------------------------------------------------------------------
-
 @torch.no_grad()
 def embed_dataset(
     encoder: nn.Module,
@@ -63,9 +59,6 @@ def embed_dataset(
     return np.concatenate(all_feats), np.concatenate(all_labels)
 
 
-# ---------------------------------------------------------------------------
-# k-NN classifier
-# ---------------------------------------------------------------------------
 
 def knn_accuracy(
     train_embeddings: np.ndarray,
@@ -113,9 +106,6 @@ def knn_accuracy(
     return float((predicted == test_labels).mean())
 
 
-# ---------------------------------------------------------------------------
-# Dimensionality reduction (t-SNE / UMAP)
-# ---------------------------------------------------------------------------
 
 def compute_tsne(
     embeddings: np.ndarray,
@@ -192,10 +182,6 @@ def compute_umap(
     ).fit_transform(embeddings)
 
 
-# ---------------------------------------------------------------------------
-# Embedding quality metrics
-# ---------------------------------------------------------------------------
-
 def class_separation(
     embeddings: np.ndarray,
     labels: np.ndarray,
@@ -238,10 +224,6 @@ def class_separation(
         "separation_ratio": ratio,
     }
 
-
-# ---------------------------------------------------------------------------
-# Visualisation helper (saves a matplotlib figure)
-# ---------------------------------------------------------------------------
 
 def plot_embeddings(
     reduced: np.ndarray,

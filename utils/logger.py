@@ -1,15 +1,3 @@
-"""
-Experiment logging utilities.
-
-Provides a unified Logger that simultaneously writes to:
-  - Python's standard logging module (stdout / rotating file)
-  - TensorBoard (optional)
-  - Weights & Biases (optional)
-
-All components obtain a child logger via ``get_logger(__name__)`` to keep
-module-level attribution in log records.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -41,9 +29,6 @@ class Logger:
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
-        # ------------------------------------------------------------------
-        # Standard Python logger
-        # ------------------------------------------------------------------
         self._logger = logging.getLogger(name)
         self._logger.setLevel(logging.DEBUG)
         self._logger.propagate = False
@@ -65,9 +50,6 @@ class Logger:
         fh.setFormatter(fmt)
         self._logger.addHandler(fh)
 
-        # ------------------------------------------------------------------
-        # TensorBoard
-        # ------------------------------------------------------------------
         self._tb_writer = None
         if use_tensorboard:
             try:
@@ -78,9 +60,6 @@ class Logger:
             except ImportError:
                 self.warning("tensorboard not installed – skipping.")
 
-        # ------------------------------------------------------------------
-        # Weights & Biases
-        # ------------------------------------------------------------------
         self._wandb = None
         if use_wandb:
             try:
@@ -91,9 +70,6 @@ class Logger:
             except ImportError:
                 self.warning("wandb not installed – skipping.")
 
-    # ------------------------------------------------------------------
-    # Standard log-level helpers
-    # ------------------------------------------------------------------
 
     def debug(self, msg: str, *args: Any) -> None:
         self._logger.debug(msg, *args)
@@ -107,9 +83,6 @@ class Logger:
     def error(self, msg: str, *args: Any) -> None:
         self._logger.error(msg, *args)
 
-    # ------------------------------------------------------------------
-    # Scalar logging (dispatched to all active backends)
-    # ------------------------------------------------------------------
 
     def log_scalar(self, tag: str, value: float, step: int) -> None:
         """Log a scalar metric to all active backends.

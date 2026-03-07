@@ -1,19 +1,3 @@
-"""
-Linear probe evaluation of a frozen SSL encoder.
-
-The encoder is loaded from a pretrained checkpoint and its parameters are
-*frozen*.  A single linear layer is trained on top of the extracted features
-using the full set of labelled training data.
-
-This protocol directly measures the quality of the learned representations
-without any fine-tuning confounds (Kornblith et al., NeurIPS 2019).
-
-Usage (typically called from :mod:`experiments.run_linear_probe`):
-
-    >>> from training.linear_probe import run_linear_probe
-    >>> run_linear_probe(encoder, train_ds, val_ds, test_ds, cfg, logger, device)
-"""
-
 from __future__ import annotations
 
 import time
@@ -29,10 +13,6 @@ from evaluation.metrics import accuracy, auroc
 from models.heads.linear_probe import LinearProbe
 from utils.logger import Logger
 
-
-# ---------------------------------------------------------------------------
-# Feature extraction
-# ---------------------------------------------------------------------------
 
 @torch.no_grad()
 def extract_features(
@@ -63,9 +43,6 @@ def extract_features(
     return torch.cat(all_feats), torch.cat(all_labels)
 
 
-# ---------------------------------------------------------------------------
-# Training the linear head
-# ---------------------------------------------------------------------------
 
 def train_linear_head(
     probe: LinearProbe,
@@ -141,10 +118,6 @@ def train_linear_head(
     logger.info("Best val accuracy: %.2f%%", best_val_acc * 100)
     return best_val_acc
 
-
-# ---------------------------------------------------------------------------
-# Public interface
-# ---------------------------------------------------------------------------
 
 def run_linear_probe(
     encoder: nn.Module,

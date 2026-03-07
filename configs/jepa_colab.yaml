@@ -1,11 +1,3 @@
-# =============================================================================
-# I-JEPA — Configuration optimisée pour Google Colab (GPU T4 / A100)
-# Différences vs jepa.yaml :
-#   - batch_size réduit pour tenir dans 15 Go VRAM (T4)
-#   - num_workers = 2 (limitation Colab)
-#   - epochs = 100 (compromis vitesse / qualité pour un premier run)
-# =============================================================================
-
 experiment:
   name: "jepa_pcam_colab"
   method: "jepa"

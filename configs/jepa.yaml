@@ -1,9 +1,3 @@
-# =============================================================================
-# I-JEPA Configuration for Histopathology Self-Supervised Pretraining
-# Reference: Assran et al., "Self-Supervised Learning from Images with a
-#            Joint-Embedding Predictive Architecture", CVPR 2023.
-# =============================================================================
-
 experiment:
   name: "jepa_histo_pretrain"
   output_dir: "outputs/jepa"
@@ -11,9 +5,6 @@ experiment:
   log_every: 50
   save_every: 10  # epochs
 
-# -----------------------------------------------------------------------------
-# Data
-# -----------------------------------------------------------------------------
 data:
   dataset: "patchcamelyon"          # patchcamelyon | camelyon16 | tcga
   data_root: "data/patchcamelyon"
@@ -21,9 +12,6 @@ data:
   num_workers: 8
   pin_memory: true
 
-# -----------------------------------------------------------------------------
-# Masking strategy (I-JEPA specific)
-# -----------------------------------------------------------------------------
 masking:
   patch_size: 8                     # tokens: image_size / patch_size = 12x12 grid
   # Context masking: keep a random subset of patches
@@ -35,9 +23,6 @@ masking:
   target_aspect_ratio: [0.75, 1.5]
   allow_overlap: false              # targets must not overlap context
 
-# -----------------------------------------------------------------------------
-# Architecture
-# -----------------------------------------------------------------------------
 model:
   encoder:
     arch: "vit_small"               # vit_tiny | vit_small | vit_base | vit_large
@@ -60,10 +45,6 @@ model:
     momentum_start: 0.996
     momentum_end: 1.0               # cosine schedule toward 1.0
 
-# -----------------------------------------------------------------------------
-# Optimisation
-# -----------------------------------------------------------------------------
-optimizer:
   name: "adamw"
   base_lr: 1.5e-4                   # scaled as lr = base_lr * batch / 256
   weight_decay: 0.05
@@ -81,9 +62,6 @@ training:
   batch_size: 512                   # total across GPUs
   fp16: true
 
-# -----------------------------------------------------------------------------
-# Augmentations
-# -----------------------------------------------------------------------------
 augmentation:
   # Standard histopathology-adapted augmentations
   random_resized_crop:

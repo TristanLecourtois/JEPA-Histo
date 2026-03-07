@@ -1,20 +1,4 @@
-"""
-Vision Transformer (ViT) encoder for self-supervised histopathology learning.
 
-Implements the standard ViT architecture (Dosovitskiy et al., 2020) with
-minor adaptations for I-JEPA and DINO:
-
-  - Optional [CLS] token (disabled for I-JEPA, enabled for DINO).
-  - Stochastic depth (drop-path) regularisation.
-  - Sinusoidal or learnable 2-D positional embeddings.
-  - Returns both patch-level and [CLS] token representations.
-
-References:
-  - Dosovitskiy et al., "An Image is Worth 16×16 Words: Transformers for
-    Image Recognition at Scale", ICLR 2021.
-  - Assran et al., "Self-Supervised Learning from Images with a
-    Joint-Embedding Predictive Architecture", CVPR 2023.
-"""
 
 from __future__ import annotations
 
@@ -27,10 +11,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from timm.models.layers import DropPath, trunc_normal_
 
-
-# ---------------------------------------------------------------------------
-# Building blocks
-# ---------------------------------------------------------------------------
 
 class Attention(nn.Module):
     """Multi-head self-attention with optional qkv-bias."""
@@ -125,10 +105,6 @@ class Block(nn.Module):
         return x
 
 
-# ---------------------------------------------------------------------------
-# Positional embedding
-# ---------------------------------------------------------------------------
-
 def get_2d_sincos_pos_embed(
     embed_dim: int,
     grid_h: int,
@@ -167,10 +143,6 @@ def get_2d_sincos_pos_embed(
         emb = torch.cat([torch.zeros(1, embed_dim), emb], dim=0)
     return emb
 
-
-# ---------------------------------------------------------------------------
-# Vision Transformer
-# ---------------------------------------------------------------------------
 
 class VisionTransformer(nn.Module):
     """Vision Transformer encoder.
@@ -282,9 +254,6 @@ class VisionTransformer(nn.Module):
         if self.cls_token is not None:
             trunc_normal_(self.cls_token, std=0.02)
 
-    # ------------------------------------------------------------------
-    # Forward
-    # ------------------------------------------------------------------
 
     def forward(
         self,
@@ -365,10 +334,6 @@ class VisionTransformer(nn.Module):
     def output_dim(self) -> int:
         return self.embed_dim
 
-
-# ---------------------------------------------------------------------------
-# Model registry
-# ---------------------------------------------------------------------------
 
 def vit_tiny(**kwargs) -> VisionTransformer:
     """ViT-Ti/8: embed_dim=192, depth=12, heads=3."""
