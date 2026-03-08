@@ -140,6 +140,11 @@ def load_checkpoint(
     model.load_state_dict(ckpt["model"])
     if optimizer is not None and "optimizer" in ckpt:
         optimizer.load_state_dict(ckpt["optimizer"])
+        # Move optimizer state tensors to the same device as the model
+        for state in optimizer.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.cuda()
     if scaler is not None and "scaler" in ckpt:
         scaler.load_state_dict(ckpt["scaler"])
     return ckpt.get("epoch", 0) + 1
