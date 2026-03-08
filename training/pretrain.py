@@ -23,7 +23,7 @@ from typing import Any, Dict, Optional
 
 import torch
 import torch.nn as nn
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 
@@ -208,11 +208,11 @@ def pretrain(
     steps_per_epoch = len(train_loader)
     total_steps     = epochs * steps_per_epoch
     warmup_steps    = sched_cfg.get("warmup_epochs", 15) * steps_per_epoch
-    base_lr         = opt_cfg["base_lr"]
-    min_lr          = sched_cfg.get("min_lr", 1e-6)
+    base_lr         = float(opt_cfg["base_lr"])
+    min_lr          = float(sched_cfg.get("min_lr", 1e-6))
 
     optimizer = build_optimizer(model, opt_cfg)
-    scaler    = GradScaler(enabled=fp16)
+    scaler    = GradScaler("cuda", enabled=fp16)
 
     start_epoch = 0
     if resume_path is not None:
@@ -235,7 +235,7 @@ def pretrain(
 
             optimizer.zero_grad(set_to_none=True)
 
-            with autocast(enabled=fp16):
+            with autocast("cuda", enabled=fp16):
                 if method == "jepa":
                     loss = _jepa_step(model, batch, device)
                 elif method == "dino":
