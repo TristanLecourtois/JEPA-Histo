@@ -45,16 +45,6 @@ Using EMA targets prevents representation collapse without requiring negative pa
 A *narrow* Transformer (half the hidden width of the encoder) takes context tokens as keys/values and target positional embeddings as queries.
 The bottleneck architecture prevents the predictor from trivially copying context features and forces it to compose semantic information.
 
-### Baselines
-
-| Method | Objective | Representation | Key paper |
-|--------|-----------|----------------|-----------|
-| **I-JEPA** | Latent patch prediction | Patch tokens (mean-pooled) | Assran et al., CVPR 2023 |
-| DINO | Self-distillation (CLS token) | [CLS] token | Caron et al., ICCV 2021 |
-| MAE | Pixel reconstruction | [CLS] token (mean-pool) | He et al., CVPR 2022 |
-
----
-
 ## Repository Structure
 
 ```
@@ -216,10 +206,18 @@ python experiments/run_linear_probe.py \
     --checkpoint outputs/jepa/checkpoint_best.pth
 ```
 
-Expected output:
-```
-Linear probe [full]  test_acc=88.41%  test_auroc=0.9523
-```
+#### Results on PatchCamelyon
+
+Linear probe evaluation with frozen ViT-S/8 encoder pretrained for 100 epochs on PCam (262,144 patches, single T4 GPU via Google Colab).
+
+| Method | Encoder | Pretrain epochs | Test Acc | Test AUROC |
+|--------|---------|----------------|----------|------------|
+| **I-JEPA (ours)** | ViT-S/8 | 100 | **78.32%** | **0.877** |
+| DINO (reported) | ViT-S/8 | 300 | ~87–89% | ~0.94 |
+| MAE (reported) | ViT-S/8 | 300 | ~84–86% | ~0.92 |
+| Supervised ResNet-50 | ResNet-50 | — | ~90% | ~0.97 |
+
+> **Note:** Our model was trained for 100 epochs due to compute constraints (single T4 GPU). Results are expected to improve significantly with 300+ epochs, which is the standard pretraining budget for I-JEPA and comparable SSL methods. The val/test accuracy gap (~7%) is a known characteristic of the PCam dataset, whose validation and test splits originate from different WSI slides.
 
 ### 3. Few-Shot Learning
 
