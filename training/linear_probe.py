@@ -69,10 +69,10 @@ def train_linear_head(
     Returns:
         Best validation accuracy achieved.
     """
-    lr      = cfg.get("lr", 1e-3)
-    wd      = cfg.get("weight_decay", 0.0)
-    epochs  = cfg.get("epochs", 100)
-    batch_s = cfg.get("batch_size", 256)
+    lr      = float(cfg.get("lr", 1e-3))
+    wd      = float(cfg.get("weight_decay", 0.0))
+    epochs  = int(cfg.get("epochs", 100))
+    batch_s = int(cfg.get("batch_size", 256))
 
     probe.to(device)
     optimizer = AdamW(probe.parameters(), lr=lr, weight_decay=wd)
