@@ -167,6 +167,7 @@ def main() -> None:
 
     # Load encoder
     encoder = load_encoder(cfg, args.checkpoint, method)
+    encoder = encoder.to(device)
     logger.info("Encoder loaded from %s", args.checkpoint)
 
     # Run few-shot sweep
